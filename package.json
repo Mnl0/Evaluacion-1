@@ -1,0 +1,20 @@
+{
+	"name": "evaluacion-1",
+	"version": "1.0.0",
+	"description": "Evaluacion-Uno-Programacion-Web",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "node --watch index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Mnl0/Evaluacion-1.git"
+	},
+	"author": "manuel-monjes",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Mnl0/Evaluacion-1/issues"
+	},
+	"homepage": "https://github.com/Mnl0/Evaluacion-1#readme"
+}
