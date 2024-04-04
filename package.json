@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"description": "Evaluacion-Uno-Programacion-Web",
 	"main": "index.js",
+	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "node --watch index.js"
@@ -16,5 +17,8 @@
 	"bugs": {
 		"url": "https://github.com/Mnl0/Evaluacion-1/issues"
 	},
-	"homepage": "https://github.com/Mnl0/Evaluacion-1#readme"
+	"homepage": "https://github.com/Mnl0/Evaluacion-1#readme",
+	"dependencies": {
+		"express": "^4.19.2"
+	}
 }
