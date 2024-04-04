@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+
+<body>
+	<form method="POST">
+		<label>Nombre</label>
+		<input type="text" name="username" id="username">
+		<label>Contrasena</label>
+		<input type="text" name="password" id="password">
+		<button type="submit">Enviar</button>
+	</form>
+</body>
+
+</html>
+<script>
+	window.addEventListener('submit', function (e) {
+		e.preventDefault();
+		let username = document.getElementById('username').value
+		let password = document.getElementById('password').value
+		const userLoged = {
+			username: username,
+			password: password,
+		}
+		const url = 'http://localhost:3000/api/login'
+		fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(userLoged)
+		})
+		console.log(userLoged)
+	})
+</script>
