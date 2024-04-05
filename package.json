@@ -1,24 +1,26 @@
 {
-	"name": "evaluacion-1",
+	"name": "certamen",
 	"version": "1.0.0",
-	"description": "Evaluacion-Uno-Programacion-Web",
-	"main": "index.js",
+	"description": "",
 	"type": "module",
+	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "node --watch index.js"
+		"start": "node server.js",
+		"dev": "nodemon server.js",
+		"unocss": "unocss public/index.html --watch",
+		"test": "vitest --ui"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Mnl0/Evaluacion-1.git"
-	},
-	"author": "manuel-monjes",
+	"keywords": [],
+	"author": "",
 	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/Mnl0/Evaluacion-1/issues"
-	},
-	"homepage": "https://github.com/Mnl0/Evaluacion-1#readme",
 	"dependencies": {
 		"express": "^4.19.2"
+	},
+	"devDependencies": {
+		"@vitest/ui": "^1.4.0",
+		"nodemon": "^3.1.0",
+		"supertest": "^6.3.4",
+		"unocss": "^0.59.0-beta.1",
+		"vitest": "^1.4.0"
 	}
 }
