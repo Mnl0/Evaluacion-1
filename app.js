@@ -11,8 +11,48 @@ const users = [{
 const todos = []
 
 app.use(express.static('public'))
-
 // Su código debe ir aquí...
+app.use(express.json())
+app.get('/api', (req, res) => {
+	res.setHeader('Content-Type', 'text/plain');
+	res.status(200);
+	res.send('Hello World!');
+})
+
+app.post('/api/login', (req, res) => {
+	const { username, password } = req.body;
+
+	if (typeof username !== 'string' || typeof password !== 'string') {
+		res.status(400);
+		res.send('el formato ingresado es incorrecto');
+		return;
+	}
+
+	if (username === '' || password === '') {
+		res.status(400);
+		res.send('la api no recibió username y/o password en el formato correcto');
+		return;
+	}
+
+	const usuarioBuscado = users.find(user => user.username === username);
+	if (usuarioBuscado === undefined) {
+		res.status(401);
+		res.send('el usuario y/o contrasena es incorrecta');
+		return;
+	}
+
+	if (usuarioBuscado.password !== password) {
+		res.status(401);
+		res.send('el usuario y/o contrasena es incorrecta');
+		console.log('password incorrecto')
+		return;
+	}
+
+
+
+
+
+})
 
 
 
