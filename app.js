@@ -41,18 +41,36 @@ app.post('/api/login', (req, res) => {
 		return;
 	}
 
-	if (usuarioBuscado.password !== password) {
-		res.status(401);
-		res.send('el usuario y/o contrasena es incorrecta');
-		console.log('password incorrecto')
-		return;
-	}
+	const [salt, key] = usuarioBuscado.password.split(':')
+	scrypt(password, salt, 64, (err, derivedkey) => {
+		if (key === derivedkey.toString('hex')) {
+			const TOKEN = randomBytes(48).toString('hex')
+			const updateUser = {
+				...usuarioBuscado,
+				token: TOKEN,
+			}
 
+			const indexUser = users.findIndex(us => us.password === password)
+			users[indexUser] = updateUser;
 
+			res.status(200);
+			res.send({
+				username: updateUser.username,
+				name: updateUser.name,
+				toke: TOKEN
+			})
 
-
+		} else {
+			res.status(401);
+			res.send('el usuario y/o contrasena es incorrecta');
+			return
+		}
+	})
 
 })
+
+
+
 
 
 
