@@ -7,17 +7,43 @@ const users = [{
 	username: 'admin',
 	name: 'Gustavo Alfredo Marín Sáez',
 	password: '1b6ce880ac388eb7fcb6bcaf95e20083:341dfbbe86013c940c8e898b437aa82fe575876f2946a2ad744a0c51501c7dfe6d7e5a31c58d2adc7a7dc4b87927594275ca235276accc9f628697a4c00b4e01' // certamen123
+}, {
+	username: 'test',
+	name: 'manuel eduardo monjes sandoval',
+	password: '85eb5e9622fdc536bb3c1285a6696068:dfec254d4d1b867fdad3b7c2d46d7f7489ea3e523a4fea91a882043adaabbd40467d1211181963cb80e5dfdb4ab7ed21a890b14eaeb7cad292b373b44669c7b1' // manuel
 }]
-const todos = []
+const todos = [{
+	id: '1234',
+	title: 'terminar certamen',
+	completed: false,
+}, {
+	id: '1',
+	title: 'terminar certamen',
+	completed: false,
+},
+{
+	id: '14',
+	title: 'terminar certamen',
+	completed: false,
+}
+]
 
 app.use(express.static('public'))
 // Su código debe ir aquí...
 app.use(express.json())
+app.use((req, res, next) => {
+	// res.setHeader('x-authorization')
+	res.setHeader('Access-Control-Allow-Origin', '*')
+	res.setHeader('Access-Control-Allow-Credentials', 'true')
+	res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, PATCH, DELETE')
+	next();
+})
+
 app.get('/api', (req, res) => {
 	res.setHeader('Content-Type', 'text/plain');
 	res.status(200);
 	res.send('Hello World!');
-})
+});
 
 app.post('/api/login', (req, res) => {
 	const { username, password } = req.body;
@@ -54,6 +80,7 @@ app.post('/api/login', (req, res) => {
 			users[indexUser] = updateUser;
 
 			res.status(200);
+			res.setHeader('X-Authorization', TOKEN)
 			res.send({
 				username: updateUser.username,
 				name: updateUser.name,
@@ -67,10 +94,58 @@ app.post('/api/login', (req, res) => {
 		}
 	})
 
+});
+
+//crear un middleware que analice si llega un token y si no es asi enviar codigo de estado
+function validateToken(req, res, next) {
+	const auth = req.get('x-authorization');
+	console.log(auth)
+	next();
+};
+
+app.get('/api/todos/:id', (req, res) => {
+	console.log(req.params);
+	res.send('enviado por parametro de ruta');
 })
 
+app.get('/api/todos', (req, res) => {
+	res.status(200);
+	res.setHeader('Content-Type', 'application/json');
+	res.send(todos);
+});
+
+//crear item
+app.post('/api/todos', (req, res) => {
+	const { title } = req.body;
+	if (title === '') {
+		res.status(400);
+		res.send('el titulo no fue enviado correctamente')
+		return
+	};
+
+	const newTodo = {
+		id: randomUUID(),
+		title: title,
+		completed: false,
+	};
+
+	todos.push(newTodo);
+
+	res.status(201);
+	res.send(todos);
+	//chequear porque no cargan bien el texto de los items
+});
+
+app.put('/api/todos/:id', (req, res) => {
+	const { id } = req.params;
+	const { title, completed } = req.body;
+
+	const elementFind = todos.find(todo => todo.id === id);
+
+	console.log(elementFind)
 
 
+})
 
 
 
