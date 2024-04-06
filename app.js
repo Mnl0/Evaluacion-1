@@ -31,14 +31,6 @@ const todos = [{
 app.use(express.static('public'))
 // Su código debe ir aquí...
 app.use(express.json())
-app.use((req, res, next) => {
-	// res.setHeader('x-authorization')
-	res.setHeader('Access-Control-Allow-Origin', '*')
-	res.setHeader('Access-Control-Allow-Credentials', 'true')
-	res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, PUT, PATCH, DELETE')
-	next();
-})
-
 app.get('/api', (req, res) => {
 	res.setHeader('Content-Type', 'text/plain');
 	res.status(200);
@@ -98,10 +90,11 @@ app.post('/api/login', (req, res) => {
 
 //crear un middleware que analice si llega un token y si no es asi enviar codigo de estado
 function validateToken(req, res, next) {
-	const auth = req.get('x-authorization');
-	console.log(auth)
+	// const token = req.headers.x - authorization;
+	// console.log(token)
 	next();
 };
+
 
 app.get('/api/todos/:id', (req, res) => {
 	console.log(req.params);
@@ -114,7 +107,6 @@ app.get('/api/todos', (req, res) => {
 	res.send(todos);
 });
 
-//crear item
 app.post('/api/todos', (req, res) => {
 	const { title } = req.body;
 	if (title === '') {
@@ -132,8 +124,7 @@ app.post('/api/todos', (req, res) => {
 	todos.push(newTodo);
 
 	res.status(201);
-	res.send(todos);
-	//chequear porque no cargan bien el texto de los items
+	res.send(newTodo);
 });
 
 app.put('/api/todos/:id', (req, res) => {
@@ -144,6 +135,19 @@ app.put('/api/todos/:id', (req, res) => {
 
 	console.log(elementFind)
 
+
+})
+
+app.delete('/api/todos/:id', (req, res) => {
+	const { id } = req.params
+	const todoIndex = todos.findIndex(todo => todo.id === id);
+	if (todoIndex === -1) {
+		res.status(404);
+		return
+	}
+	todos.splice(todoIndex, 1)
+	res.status(204)
+	res.send(todos);
 
 })
 
