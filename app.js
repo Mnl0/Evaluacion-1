@@ -68,15 +68,16 @@ app.post('/api/login', (req, res) => {
 				token: TOKEN,
 			}
 
-			const indexUser = users.findIndex(us => us.password === password)
+			const indexUser = users.findIndex(us => us.password === usuarioBuscado.password)
 			users[indexUser] = updateUser;
 
+
 			res.status(200);
-			res.setHeader('X-Authorization', TOKEN)
+			res.setHeader('X-Authorization', updateUser.token)
 			res.send({
 				username: updateUser.username,
 				name: updateUser.name,
-				toke: TOKEN
+				token: TOKEN
 			})
 
 		} else {
@@ -88,10 +89,12 @@ app.post('/api/login', (req, res) => {
 
 });
 
-//crear un middleware que analice si llega un token y si no es asi enviar codigo de estado
 function validateToken(req, res, next) {
-	// const token = req.headers.x - authorization;
-	// console.log(token)
+	const token = req.headers['x-authorization']
+
+	const tokenFind = users.find((user) => user.token === token)
+	console.log(tokenFind)
+
 	next();
 };
 
@@ -101,7 +104,7 @@ app.get('/api/todos/:id', (req, res) => {
 	res.send('enviado por parametro de ruta');
 })
 
-app.get('/api/todos', (req, res) => {
+app.get('/api/todos', validateToken, (req, res) => {
 	res.status(200);
 	res.setHeader('Content-Type', 'application/json');
 	res.send(todos);
@@ -131,10 +134,36 @@ app.put('/api/todos/:id', (req, res) => {
 	const { id } = req.params;
 	const { title, completed } = req.body;
 
+	if (id === undefined) {
+		return
+	}
 	const elementFind = todos.find(todo => todo.id === id);
+	if (elementFind === undefined) {
+		res.status(404)
+		res.send('el item a modificar no existe')
+		return
+	}
 
+	if (title !== undefined) {
+		elementFind.title = title
+		res.status(200)
+		res.send(elementFind)
+		return;
+	}
+
+	if (completed === true) {
+		elementFind.completed = true;
+		res.status(200)
+		res.send(elementFind)
+		return
+	}
+	if (completed === false) {
+		elementFind.completed = false;
+		res.status(200)
+		res.send(elementFind)
+		return
+	}
 	console.log(elementFind)
-
 
 })
 
@@ -150,8 +179,6 @@ app.delete('/api/todos/:id', (req, res) => {
 	res.send(todos);
 
 })
-
-
 
 // ... hasta aquí
 
