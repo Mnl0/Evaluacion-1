@@ -41,21 +41,24 @@ app.post('/api/login', (req, res) => {
 	const { username, password } = req.body;
 
 	if (typeof username !== 'string' || typeof password !== 'string') {
+		res.setHeader('Content-Type', 'application/json');//preguntar si es necesario enviar esto
 		res.status(400);
-		res.send('el formato ingresado es incorrecto');
+		res.send('username y/o password en el formato correcto');//preguntar si corresponde enviar mensajes
 		return;
 	}
 
 	if (username === '' || password === '') {
+		res.setHeader('Content-Type', 'application/json');
 		res.status(400);
-		res.send('la api no recibió username y/o password en el formato correcto');
+		res.send('username y/o password en el formato correcto');
 		return;
 	}
 
 	const usuarioBuscado = users.find(user => user.username === username);
 	if (usuarioBuscado === undefined) {
+		res.setHeader('Content-Type', 'application/json');
 		res.status(401);
-		res.send('el usuario y/o contrasena es incorrecta');
+		res.send('usuario y/o contrasena incorrecta');
 		return;
 	}
 
@@ -66,14 +69,14 @@ app.post('/api/login', (req, res) => {
 			const updateUser = {
 				...usuarioBuscado,
 				token: TOKEN,
-			}
+			};
 
 			const indexUser = users.findIndex(us => us.password === usuarioBuscado.password)
 			users[indexUser] = updateUser;
 
-
+			res.setHeader('Content-Type', 'application/json');
 			res.status(200);
-			res.setHeader('X-Authorization', updateUser.token)
+			res.setHeader('X-Authorization', updateUser.token)//preguntar si es necesario creo que no
 			res.send({
 				username: updateUser.username,
 				name: updateUser.name,
@@ -82,7 +85,7 @@ app.post('/api/login', (req, res) => {
 
 		} else {
 			res.status(401);
-			res.send('el usuario y/o contrasena es incorrecta');
+			res.send('usuario y/o contrasena incorrecta');
 			return
 		}
 	})
@@ -92,29 +95,39 @@ app.post('/api/login', (req, res) => {
 function validateToken(req, res, next) {
 	const token = req.headers['x-authorization']
 
-	const tokenFind = users.find((user) => user.token === token)
-	console.log(tokenFind)
-
+	const tokenFind = users.find((user) => user.token === token);
+	if (tokenFind === undefined) {
+		res.sendStatus(401);
+		return;
+	}
 	next();
 };
 
-
-app.get('/api/todos/:id', (req, res) => {
-	console.log(req.params);
-	res.send('enviado por parametro de ruta');
-})
-
 app.get('/api/todos', validateToken, (req, res) => {
-	res.status(200);
 	res.setHeader('Content-Type', 'application/json');
+	res.status(200);
 	res.send(todos);
 });
 
-app.post('/api/todos', (req, res) => {
+app.get('/api/todos/:id', validateToken, (req, res) => {
+	const { id } = req.params;
+	res.setHeader('Content-Type', 'application/json');
+	const elementFind = todos.find(todo => todo.id === id);
+	if (elementFind === undefined) {
+		res.status(404);
+		res.send('item no existe');
+		return;
+	}
+	res.status(200);
+	res.send(elementFind)
+})
+
+app.post('/api/todos', validateToken, (req, res) => {
 	const { title } = req.body;
 	if (title === '') {
+		res.setHeader('Content-Type', 'application/json');//preguntar si debo poner en cada respuestas me parece redundante
 		res.status(400);
-		res.send('el titulo no fue enviado correctamente')
+		res.send('title no fue enviado correctamente')
 		return
 	};
 
@@ -130,22 +143,39 @@ app.post('/api/todos', (req, res) => {
 	res.send(newTodo);
 });
 
-app.put('/api/todos/:id', (req, res) => {
+app.put('/api/todos/:id', validateToken, (req, res) => {
 	const { id } = req.params;
 	const { title, completed } = req.body;
 
 	if (id === undefined) {
 		return
 	}
+
 	const elementFind = todos.find(todo => todo.id === id);
 	if (elementFind === undefined) {
+		res.setHeader('Content-Type', 'application/json')
 		res.status(404)
-		res.send('el item a modificar no existe')
+		res.send('item a modificar no existe')
 		return
+	}
+
+	if (title === undefined) {
+		res.setHeader('Content-Type', 'application/json')
+		res.status(404)
+		res.send('formato incorrecto')
+		return;
+	}
+
+	if (completed === undefined) {
+		res.setHeader('Content-Type', 'application/json')
+		res.status(404)
+		res.send('formato incorrecto')
+		return;
 	}
 
 	if (title !== undefined) {
 		elementFind.title = title
+		res.setHeader('Content-Type', 'application/json')
 		res.status(200)
 		res.send(elementFind)
 		return;
@@ -153,25 +183,28 @@ app.put('/api/todos/:id', (req, res) => {
 
 	if (completed === true) {
 		elementFind.completed = true;
+		res.setHeader('Content-Type', 'application/json')
 		res.status(200)
 		res.send(elementFind)
 		return
 	}
+
 	if (completed === false) {
 		elementFind.completed = false;
+		res.setHeader('Content-Type', 'application/json')
 		res.status(200)
 		res.send(elementFind)
 		return
 	}
-	console.log(elementFind)
 
 })
 
-app.delete('/api/todos/:id', (req, res) => {
+app.delete('/api/todos/:id', validateToken, (req, res) => {
 	const { id } = req.params
 	const todoIndex = todos.findIndex(todo => todo.id === id);
 	if (todoIndex === -1) {
 		res.status(404);
+		res.send('item no existe')
 		return
 	}
 	todos.splice(todoIndex, 1)
