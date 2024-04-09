@@ -41,9 +41,9 @@ app.post('/api/login', (req, res) => {
 	const { username, password } = req.body;
 
 	if (typeof username !== 'string' || typeof password !== 'string') {
-		res.setHeader('Content-Type', 'application/json');//preguntar si es necesario enviar esto
+		res.setHeader('Content-Type', 'application/json');
 		res.status(400);
-		res.send('username y/o password en el formato correcto');//preguntar si corresponde enviar mensajes
+		res.send('username y/o password en el formato correcto');
 		return;
 	}
 
@@ -76,7 +76,7 @@ app.post('/api/login', (req, res) => {
 
 			res.setHeader('Content-Type', 'application/json');
 			res.status(200);
-			res.setHeader('X-Authorization', updateUser.token)//preguntar si es necesario creo que no
+			res.setHeader('X-Authorization', updateUser.token)
 			res.send({
 				username: updateUser.username,
 				name: updateUser.name,
@@ -125,7 +125,7 @@ app.get('/api/todos/:id', validateToken, (req, res) => {
 app.post('/api/todos', validateToken, (req, res) => {
 	const { title } = req.body;
 	if (title === '') {
-		res.setHeader('Content-Type', 'application/json');//preguntar si debo poner en cada respuestas me parece redundante
+		res.setHeader('Content-Type', 'application/json');
 		res.status(400);
 		res.send('title no fue enviado correctamente')
 		return
@@ -139,6 +139,7 @@ app.post('/api/todos', validateToken, (req, res) => {
 
 	todos.push(newTodo);
 
+	res.setHeader('Content-Type', 'application/json');
 	res.status(201);
 	res.send(newTodo);
 });
