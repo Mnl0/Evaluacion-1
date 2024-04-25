@@ -12,7 +12,21 @@ const users = [{
 	name: 'manuel eduardo monjes sandoval',
 	password: '85eb5e9622fdc536bb3c1285a6696068:dfec254d4d1b867fdad3b7c2d46d7f7489ea3e523a4fea91a882043adaabbd40467d1211181963cb80e5dfdb4ab7ed21a890b14eaeb7cad292b373b44669c7b1' // manuel
 }]
-export const todos = []
+const todos = [{
+	id: '1234',
+	title: 'terminar certamen',
+	completed: false,
+}, {
+	id: '1',
+	title: 'terminar certamen',
+	completed: false,
+},
+{
+	id: '14',
+	title: 'terminar certamen',
+	completed: false,
+}
+]
 
 app.use(express.static('public'))
 // Su código debe ir aquí...
