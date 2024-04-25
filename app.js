@@ -34,7 +34,6 @@ app.use(express.json())
 
 function validateToken(req, res, next) {
 	const token = req.headers['x-authorization']
-	console.log(token)
 
 	if (!token) {
 		return res.sendStatus(401)
