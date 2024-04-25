@@ -12,57 +12,47 @@ const users = [{
 	name: 'manuel eduardo monjes sandoval',
 	password: '85eb5e9622fdc536bb3c1285a6696068:dfec254d4d1b867fdad3b7c2d46d7f7489ea3e523a4fea91a882043adaabbd40467d1211181963cb80e5dfdb4ab7ed21a890b14eaeb7cad292b373b44669c7b1' // manuel
 }]
-const todos = [{
-	id: '1234',
-	title: 'terminar certamen',
-	completed: false,
-}, {
-	id: '1',
-	title: 'terminar certamen',
-	completed: false,
-},
-{
-	id: '14',
-	title: 'terminar certamen',
-	completed: false,
-}
-]
+export const todos = []
 
 app.use(express.static('public'))
 // Su código debe ir aquí...
 app.use(express.json())
+
+function validateToken(req, res, next) {
+	const token = req.headers['x-authorization']
+	console.log(token)
+
+	if (!token) {
+		return res.sendStatus(401)
+	}
+
+	const tokenFind = users.find((user) => user.token === token);
+
+	if (!tokenFind) {
+		return res.sendStatus(401);
+	}
+	next();
+};
+
 app.get('/api', (req, res) => {
-	res.setHeader('Content-Type', 'text/plain');
-	res.status(200);
-	res.send('Hello World!');
+	res.setHeader('Content-Type', 'text/plain').send('Hello World!');
 });
 
 app.post('/api/login', (req, res) => {
 	const { username, password } = req.body;
 
 	if (typeof username !== 'string' || typeof password !== 'string') {
-		res.setHeader('Content-Type', 'application/json');
-		res.status(400);
-		res.send('username y/o password en el formato correcto');
-		return;
-	}
-
-	if (username === '' || password === '') {
-		res.setHeader('Content-Type', 'application/json');
-		res.status(400);
-		res.send('username y/o password en el formato correcto');
-		return;
+		return res.sendStatus(400);
 	}
 
 	const usuarioBuscado = users.find(user => user.username === username);
-	if (usuarioBuscado === undefined) {
-		res.setHeader('Content-Type', 'application/json');
-		res.status(401);
-		res.send('usuario y/o contrasena incorrecta');
-		return;
+
+	if (!usuarioBuscado) {
+		return res.sendStatus(401);
 	}
 
 	const [salt, key] = usuarioBuscado.password.split(':')
+
 	scrypt(password, salt, 64, (err, derivedkey) => {
 		if (key === derivedkey.toString('hex')) {
 			const TOKEN = randomBytes(48).toString('hex')
@@ -72,63 +62,39 @@ app.post('/api/login', (req, res) => {
 			};
 
 			const indexUser = users.findIndex(us => us.password === usuarioBuscado.password)
+
 			users[indexUser] = updateUser;
 
-			res.setHeader('Content-Type', 'application/json');
-			res.status(200);
-			res.setHeader('X-Authorization', updateUser.token)
 			res.send({
 				username: updateUser.username,
 				name: updateUser.name,
-				token: TOKEN
+				token: updateUser.token
 			})
 
 		} else {
-			res.status(401);
-			res.send('usuario y/o contrasena incorrecta');
-			return
+			return res.status(401).send('usuario y/o contrasena incorrecta');
 		}
 	})
 
 });
 
-function validateToken(req, res, next) {
-	const token = req.headers['x-authorization']
-
-	const tokenFind = users.find((user) => user.token === token);
-	if (tokenFind === undefined) {
-		res.sendStatus(401);
-		return;
-	}
-	next();
-};
-
 app.get('/api/todos', validateToken, (req, res) => {
-	res.setHeader('Content-Type', 'application/json');
-	res.status(200);
 	res.send(todos);
 });
 
 app.get('/api/todos/:id', validateToken, (req, res) => {
 	const { id } = req.params;
-	res.setHeader('Content-Type', 'application/json');
 	const elementFind = todos.find(todo => todo.id === id);
-	if (elementFind === undefined) {
-		res.status(404);
-		res.send('item no existe');
-		return;
+	if (!elementFind) {
+		return res.status(404).send('item no existe');
 	}
-	res.status(200);
 	res.send(elementFind)
 })
 
 app.post('/api/todos', validateToken, (req, res) => {
 	const { title } = req.body;
-	if (title === '') {
-		res.setHeader('Content-Type', 'application/json');
-		res.status(400);
-		res.send('title no fue enviado correctamente')
-		return
+	if (typeof title !== 'string') {
+		return res.status(400).json('title no fue enviado correctamente')
 	};
 
 	const newTodo = {
@@ -139,64 +105,32 @@ app.post('/api/todos', validateToken, (req, res) => {
 
 	todos.push(newTodo);
 
-	res.setHeader('Content-Type', 'application/json');
-	res.status(201);
-	res.send(newTodo);
+	res.status(201).send(newTodo);
 });
 
 app.put('/api/todos/:id', validateToken, (req, res) => {
 	const { id } = req.params;
 	const { title, completed } = req.body;
 
-	if (id === undefined) {
-		return
-	}
-
 	const elementFind = todos.find(todo => todo.id === id);
-	if (elementFind === undefined) {
-		res.setHeader('Content-Type', 'application/json')
-		res.status(404)
-		res.send('item a modificar no existe')
-		return
+
+	if (!elementFind) {
+		return res.status(404).json('Item no encontrado')
 	}
 
-	if (title === undefined) {
-		res.setHeader('Content-Type', 'application/json')
-		res.status(404)
-		res.send('formato incorrecto')
-		return;
+	if ((title !== undefined && typeof title !== 'string') || (completed !== undefined && typeof completed !== 'boolean')) {
+		return res.status(400).json('Formato Incorrecto')
 	}
 
-	if (completed === undefined) {
-		res.setHeader('Content-Type', 'application/json')
-		res.status(404)
-		res.send('formato incorrecto')
-		return;
-	}
-
-	if (title !== undefined) {
+	if (typeof title === 'string') {
 		elementFind.title = title
-		res.setHeader('Content-Type', 'application/json')
-		res.status(200)
-		res.send(elementFind)
-		return;
 	}
 
-	if (completed === true) {
-		elementFind.completed = true;
-		res.setHeader('Content-Type', 'application/json')
-		res.status(200)
-		res.send(elementFind)
-		return
+	if (typeof completed === 'boolean') {
+		elementFind.completed = completed
 	}
 
-	if (completed === false) {
-		elementFind.completed = false;
-		res.setHeader('Content-Type', 'application/json')
-		res.status(200)
-		res.send(elementFind)
-		return
-	}
+	res.status(200).send(elementFind)
 
 })
 
@@ -204,13 +138,10 @@ app.delete('/api/todos/:id', validateToken, (req, res) => {
 	const { id } = req.params
 	const todoIndex = todos.findIndex(todo => todo.id === id);
 	if (todoIndex === -1) {
-		res.status(404);
-		res.send('item no existe')
-		return
+		return res.status(404).json('item no existe')
 	}
 	todos.splice(todoIndex, 1)
-	res.status(204)
-	res.send(todos);
+	res.status(204).send(todos);
 
 })
 
