@@ -1,0 +1,30 @@
+POST http://localhost:3000/api/todos http/1.1
+content-type: application/json
+
+{
+    "id": "14",
+	"title": "terminar certamen",
+	"completed": false,
+}
+
+PUT http://localhost:3000/api/login/14 http/1.1
+content-type: application/json
+
+{
+	"title": "terminar certamen",
+	"completed": false,
+}
+
+GET http://localhost:3000/api/todos http/1.1
+
+GET http://localhost:3000/api/todos/14 http/1.1
+
+DELETE http://localhost:3000/api/14 http/1.1
+
+POST http://localhost:3000//api/login http/1.1
+{
+    "username": "admin",
+    "password": "certamen123"
+}
+
+falta el token

@@ -14,7 +14,8 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"express": "^4.19.2"
+		"express": "^4.19.2",
+		"yup": "^1.4.0"
 	},
 	"devDependencies": {
 		"@vitest/ui": "^1.4.0",
