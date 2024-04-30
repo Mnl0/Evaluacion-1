@@ -1,7 +1,7 @@
 import express from 'express'
 import { scrypt, randomBytes } from 'node:crypto'
 import { getTodo, getUser, getAllTodo, createTodo, getUsTk, deleteTodo, editTodo } from '../repositories/todoRepositories.js';
-import { createTodoSchema } from '../schemas/todoSchema.js';
+import { createTodoSchema, updateTodoSchema } from '../schemas/todoSchema.js';
 
 const routerTodo = express.Router();
 
@@ -92,31 +92,7 @@ routerTodo.post('/api/todos', validateToken, callMiddleware(createTodoSchema), (
 	res.status(201).send(createTodo(req.body.title));
 });
 
-routerTodo.put('/api/todos/:id', validateToken, (req, res) => {
-	// const { title, completed } = req.body;
-
-	// const elementFind = getTodo(req.params.id)
-
-	// if (!elementFind) {
-	// 	return res.status(404).json('Item no encontrado')
-	// }
-
-	// if ((title !== undefined && typeof title !== 'string') || (completed !== undefined && typeof completed !== 'boolean')) {
-	// 	return res.status(400).json('Formato Incorrecto')
-	// }
-
-	// if (typeof title === 'string') {
-	// 	elementFind.title = title
-	// }
-
-	// if (typeof completed === 'boolean') {
-	// 	elementFind.completed = completed
-	// }
-
-	// res.status(200).send(elementFind)
-
-	//###########consultar si debo eliminar las validaciones#############
-
+routerTodo.put('/api/todos/:id', validateToken, callMiddleware(updateTodoSchema), (req, res) => {
 	const todo = editTodo(req.params.id, req.body)
 	if (todo) {
 		res.send(todo)
